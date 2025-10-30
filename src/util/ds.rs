@@ -16,15 +16,15 @@ pub struct Point {
 #[derive(Debug, Eq, PartialEq)]
 pub struct Layer {
     /// The index of the layer, 0 is the bottom one and is the first to be printed
-    index: usize,
-    segments: Vec<Segment>,
+    pub index: usize,
+    pub segments: Vec<Segment>,
 }
 
 /// An object to be printed
 #[derive(Debug, Eq, PartialEq)]
 pub struct Obj {
     /// Layers from bottom to top, with each layer's index matching the index in this Vec
-    layers: Vec<Layer>,
+    pub layers: Vec<Layer>,
 }
 
 // The provided files under data/ are given under this format.
@@ -93,13 +93,13 @@ impl Obj {
                 segments: Vec::with_capacity(nb_segments),
             };
 
-            for j in 0..nb_segments {
+            // TODO: remove the -1 added because of data incoherence
+            for j in 0..nb_segments - 1 {
                 let segment_line = lines
                     .next()
                     .unwrap_or_else(|| panic!("A segment should exist for index {j}"));
 
                 let mut splits = segment_line.split(" ");
-
                 let mut values: [u32; 4] = [0; 4];
                 for k in 0..4 {
                     let value = splits
