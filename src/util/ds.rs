@@ -1,18 +1,20 @@
+use core::panic;
+
 /// Segment to be printed
 #[derive(Debug, Eq, PartialEq)]
-struct Segment {
+pub struct Segment {
     first: Point,
     second: Point,
 }
 
 #[derive(Debug, Eq, PartialEq)]
-struct Point {
+pub struct Point {
     x: u32,
     y: u32,
 }
 
 #[derive(Debug, Eq, PartialEq)]
-struct Layer {
+pub struct Layer {
     /// The index of the layer, 0 is the bottom one and is the first to be printed
     index: usize,
     segments: Vec<Segment>,
@@ -20,7 +22,7 @@ struct Layer {
 
 /// An object to be printed
 #[derive(Debug, Eq, PartialEq)]
-struct Obj {
+pub struct Obj {
     /// Layers from bottom to top, with each layer's index matching the index in this Vec
     layers: Vec<Layer>,
 }
@@ -104,7 +106,9 @@ impl Obj {
                         .next()
                         .map(&str::parse::<u32>)
                         .expect("Number must be present")
-                        .expect("Invalid number for nb of segments");
+                        .unwrap_or_else(|_| {
+                            panic!("Invalid number for point coordinate {k} in '{segment_line}'")
+                        });
                     values[k] = value;
                 }
 
