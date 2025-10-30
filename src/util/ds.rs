@@ -1,5 +1,20 @@
 use core::panic;
 
+#[derive(Debug, Eq, PartialEq)]
+pub struct Point {
+    x: u32,
+    y: u32,
+}
+
+impl Point {
+    /// Calculate the Euclidian distance between 2 points
+    pub fn distance(&self, other: &Point) -> f64 {
+        let delta_x: i64 = self.x as i64 - other.x as i64;
+        let delta_y: i64 = self.y as i64 - other.y as i64;
+        f64::sqrt((delta_x.pow(2) + delta_y.pow(2)) as f64)
+    }
+}
+
 /// Segment to be printed
 #[derive(Debug, Eq, PartialEq)]
 pub struct Segment {
@@ -7,10 +22,10 @@ pub struct Segment {
     second: Point,
 }
 
-#[derive(Debug, Eq, PartialEq)]
-pub struct Point {
-    x: u32,
-    y: u32,
+impl Segment {
+    pub fn distance(&self) -> f64 {
+        self.first.distance(&self.second)
+    }
 }
 
 #[derive(Debug, Eq, PartialEq)]
@@ -39,13 +54,6 @@ pub struct Obj {
 //
 // 132 Nb couches
 // 0 2029 Numéro de couche, nb segments
-// 92187 76081 93055 75212
-// 93055 75212 94671 74277
-// 94671 74277 100626 70841
-// 100626 70841 101812 70524
-// ...
-//
-// 1 940 Numéro de couche, nb segments
 // 90505 88409 90505 79629
 // 90505 79629 90823 78443
 // 90823 78443 92187 76081
@@ -53,6 +61,16 @@ pub struct Obj {
 // ...
 
 impl Obj {
+    pub fn total_distance(&self) -> f64 {
+        let mut total: f64 = 0.0;
+        for layer in &self.layers {
+            for segment in &layer.segments {
+                total += segment.distance()
+            }
+        }
+        total
+    }
+
     pub fn from_file_content(content: &str) -> Self {
         let mut lines = content.lines();
         let first_line = lines
@@ -139,13 +157,14 @@ mod tests {
 
     #[test]
     fn test_file_can_be_parsed() {
+        // TODO: fix the nb segments too after data bug
         let content = "2 Nb couches
-0 4 Numéro de couche, nb segments
+0 5 Numéro de couche, nb segments
 92187 76081 93055 75212
 93055 75212 94671 74277
 94671 74277 100626 70841
 100626 70841 101812 70524
-1 3 Numéro de couche, nb segments
+1 4 Numéro de couche, nb segments
 90505 88409 90505 79629
 90505 79629 90823 78443
 90823 78443 92187 76081";
@@ -205,5 +224,20 @@ mod tests {
                 ]
             }
         );
+    }
+
+    #[test]
+    fn point_to_point_distance_is_correct() {
+        // The pythagore triplet 3-4-5
+        assert_eq!(5., Point { x: 2, y: 0 }.distance(&Point { x: 5, y: 4 }));
+
+        // A random situation: sqrt((53−5)^2+(623−13)^2)
+        assert_eq!(
+            611.8856102246563, // Not sure this is working cross CPU...
+            Point { x: 5, y: 13 }.distance(&Point { x: 53, y: 623 })
+        );
+
+        // Same points
+        assert_eq!(0., Point { x: 5, y: 13 }.distance(&Point { x: 5, y: 13 }));
     }
 }

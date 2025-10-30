@@ -18,8 +18,9 @@ fn print_datasets_stats() {
         println!("Dataset {}", filename.blue());
         let obj = Obj::from_file_content(&read_to_string(path).unwrap());
         println!(
-            "Layers: {}\nMin segments/layer: {}\nMax segments/layer: {}",
+            "Layers: {}\nTotal segments: {}\nMin segments/layer: {}\nMax segments/layer: {}\n{}",
             obj.layers.len(),
+            obj.layers.iter().map(|a| a.segments.len()).sum::<usize>(),
             obj.layers
                 .iter()
                 .min_by(|a, b| a.segments.len().cmp(&b.segments.len()))
@@ -31,7 +32,8 @@ fn print_datasets_stats() {
                 .max_by(|a, b| a.segments.len().cmp(&b.segments.len()))
                 .unwrap()
                 .segments
-                .len()
+                .len(),
+            format!("Total distance: {:.1}", obj.total_distance()).yellow()
         );
         println!();
     }
