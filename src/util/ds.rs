@@ -1,12 +1,18 @@
 use core::panic;
+use std::{fmt::Display, u32};
 
-#[derive(Debug, Eq, PartialEq)]
+use colored::Colorize;
+
+#[derive(Debug, Eq, PartialEq, Clone)]
 pub struct Point {
-    x: u32,
-    y: u32,
+    pub x: u32,
+    pub y: u32,
 }
 
 impl Point {
+    pub fn new(x: u32, y: u32) -> Self {
+        Self { x, y }
+    }
     /// Calculate the Euclidian distance between 2 points
     pub fn distance(&self, other: &Point) -> f64 {
         let delta_x: i64 = self.x as i64 - other.x as i64;
@@ -15,11 +21,17 @@ impl Point {
     }
 }
 
+impl Display for Point {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "({},{})", self.x, self.y)
+    }
+}
+
 /// Segment to be printed
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, PartialEq, Clone)]
 pub struct Segment {
-    first: Point,
-    second: Point,
+    pub first: Point,
+    pub second: Point,
 }
 
 impl Segment {
@@ -69,6 +81,27 @@ impl Obj {
             }
         }
         total
+    }
+
+    pub fn print_stats(&self) {
+        println!(
+            "Layers: {}\nTotal segments: {}\nMin segments/layer: {}\nMax segments/layer: {}\n{}",
+            self.layers.len(),
+            self.layers.iter().map(|a| a.segments.len()).sum::<usize>(),
+            self.layers
+                .iter()
+                .min_by(|a, b| a.segments.len().cmp(&b.segments.len()))
+                .unwrap()
+                .segments
+                .len(),
+            self.layers
+                .iter()
+                .max_by(|a, b| a.segments.len().cmp(&b.segments.len()))
+                .unwrap()
+                .segments
+                .len(),
+            format!("Total distance: {:.1}", self.total_distance()).yellow()
+        );
     }
 
     pub fn from_file_content(content: &str) -> Self {
@@ -238,6 +271,6 @@ mod tests {
         );
 
         // Same points
-        assert_eq!(0., Point { x: 5, y: 13 }.distance(&Point { x: 5, y: 13 }));
+        assert_eq!(0., Point::new(5, 13).distance(&Point::new(5, 13)));
     }
 }
