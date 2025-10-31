@@ -44,17 +44,8 @@ fn print_dataset_details(dataset_file: &str) {
             if segment.first != last_second_point {
                 let idle_movement_dist = last_second_point.distance(&segment.first);
                 total_idle_movement_distance_per_layer += idle_movement_dist;
-                println!(
-                    "Segment {j} {} -> {}: {:.2} {}",
-                    segment.first,
-                    segment.second,
-                    distance,
-                    if idle_movement_dist > 0. {
-                        format!("+{:.2}", idle_movement_dist).red().bold()
-                    } else {
-                        ColoredString::default()
-                    }
-                );
+
+                format!("+{:.2}", idle_movement_dist).red().bold()
             }
             last_second_point = segment.second.clone();
         }

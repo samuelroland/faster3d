@@ -40,6 +40,16 @@ impl Segment {
     }
 }
 
+impl Display for Segment {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "Segment {j} {} -> {}: {:.2} {}",
+            segment.first, segment.second, distance,
+        );
+    }
+}
+
 #[derive(Debug, Eq, PartialEq)]
 pub struct Layer {
     /// The index of the layer, 0 is the bottom one and is the first to be printed
